@@ -1,6 +1,6 @@
 import streamlit as st
-from spacepytraders import SpaceTraders
-from spacepytraders.errors import SpaceTradersAPIError
+from SpacePyTraders  import SpaceTraders
+from SpacePyTraders.errors import SpaceTradersAPIError
 
 def authenticate_agent(api, token=None, username=None):
     """Authenticate agent using either an existing token or by registering as a new agent."""
