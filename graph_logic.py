@@ -44,8 +44,31 @@ def register_agent(username: str):
         return response.json()
     return None
 
-# Stream graph updates based on user input
-def stream_graph_updates(user_input: str):
+# Define the custom tool to display agent status
+def agent_status_tool(state: State, token: str):
+    agent_info = get_agent_info(token)
+    if agent_info:
+        status = (
+            f"**Username:** {agent_info['symbol']}\n"
+            f"**Credits:** {agent_info['credits']}\n"
+            f"**Ships Owned:** {agent_info.get('shipCount', 0)}\n"
+            f"**Structures Owned:** {agent_info.get('structureCount', 0)}"
+        )
+        return {"messages": [status]}
+    return {"messages": ["Could not retrieve agent status."]}
+
+# Add the agent status tool node to the graph
+graph_builder.add_node("agent_status", agent_status_tool)
+
+# Function to stream graph updates with the tool interaction logic
+def stream_graph_updates(user_input: str, token: str):
     for event in graph.stream({"messages": [{"role": "user", "content": user_input}]}):
         for value in event.values():
-            return value["messages"][-1].content  # Return chatbot message
+            # Check if the current node is the "agent_status" tool node
+            if "agent_status" in value:
+                return value["messages"][-1]
+            elif not "agent_status" in value:
+                return "Ending the conversation as no further tool is called."
+
+# Compile the graph again after adding the new node
+graph = graph_builder.compile()

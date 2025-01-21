@@ -2,7 +2,11 @@
 import streamlit as st
 from graph_logic import get_agent_info, register_agent, stream_graph_updates
 
+
 def main():
+
+    AUTH_TOKEN = ""
+    
     st.title("SpaceTraders.io Assistant")
 
     # If the user is logged in, display agent info and chatbot interface
@@ -25,7 +29,7 @@ def main():
         
         # Display the output only after the button is clicked
         if submit_button:
-            response = stream_graph_updates(text_input)
+            response = stream_graph_updates(text_input, AUTH_TOKEN)
             if response:
                 st.write("Assistant:", response)
     
@@ -40,6 +44,7 @@ def main():
                 if agent_info:
                     st.session_state["token"] = token
                     st.session_state["agent_info"] = agent_info
+                    AUTH_TOKEN = token
                     st.sidebar.success("Logged in successfully!")
                     # Clear sidebar by re-writing with an empty message
                     st.sidebar.empty()
