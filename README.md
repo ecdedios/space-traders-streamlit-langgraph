@@ -11,7 +11,6 @@
 Some technologies used:
 
 - streamlit
-- spacepytraders
 - langchain
 - langgraph
 
