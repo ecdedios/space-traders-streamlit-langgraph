@@ -2,25 +2,24 @@
 import streamlit as st
 from graph_logic import get_agent_info, register_agent, stream_graph_updates
 
+global AUTH_TOKEN
 
 def main():
 
-    AUTH_TOKEN = ""
-    
     st.title("SpaceTraders.io Assistant")
 
     # If the user is logged in, display agent info and chatbot interface
     if "agent_info" in st.session_state:
         agent_info = st.session_state["agent_info"]
+        print(agent_info)
+        symbol = agent_info['data']['symbol']  # Default to 'N/A' if not found
+        credits = agent_info['data']['credits']  # Default to 0 if not found
+        ships_owned = agent_info['data']['shipCount']
+
         st.sidebar.header("Agent Information")
-        st.sidebar.write(f"**Username:** {agent_info['symbol']}")
-        st.sidebar.write(f"**Credits:** {agent_info['credits']}")
-
-        ships_owned = agent_info.get('shipCount', [])
+        st.sidebar.write(f"**Username:** {symbol}")
+        st.sidebar.write(f"**Credits:** {credits:,}")
         st.sidebar.write(f"**Ships Owned:** {ships_owned}")
-
-        structures_owned = agent_info.get('structureCount', [])
-        st.sidebar.write(f"**Structures Owned:** {structures_owned}")
 
         # Creating a form where the Enter key won't trigger an automatic submission
         with st.form("my_form"):
