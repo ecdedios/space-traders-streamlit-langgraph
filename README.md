@@ -1,6 +1,6 @@
 # Space Trading with Streamlit and LangGraph
 
-> User interface for the Space Traders API using Stremlit. Additional gameplay logic implemented with multi-agent workflows using LangGraph.
+> User interface for the Space Traders API using Streamlit. Additional gameplay logic implemented with multi-agent workflows using LangGraph.
 
 ## API
 
