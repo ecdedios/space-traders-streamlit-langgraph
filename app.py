@@ -1,66 +1,6 @@
+# app.py
 import streamlit as st
-import requests
-
-
-# Base URL for the SpaceTraders API
-API_BASE_URL = "https://api.spacetraders.io/v2"
-
-from typing import Annotated
-
-from typing_extensions import TypedDict
-
-from langgraph.graph import StateGraph, START, END
-from langgraph.graph.message import add_messages
-
-
-class State(TypedDict):
-    # Messages have the type "list". The `add_messages` function
-    # in the annotation defines how this state key should be updated
-    # (in this case, it appends messages to the list, rather than overwriting them)
-    messages: Annotated[list, add_messages]
-
-
-graph_builder = StateGraph(State)
-
-
-from langchain_openai import ChatOpenAI
-
-# Use OpenAI's GPT-4o-mini model
-llm = ChatOpenAI(model="gpt-4o-mini")
-
-
-def chatbot(state: State):
-    return {"messages": [llm.invoke(state["messages"])]}
-
-
-# The first argument is the unique node name
-# The second argument is the function or object that will be called whenever
-# the node is used.
-graph_builder.add_node("chatbot", chatbot)
-graph_builder.add_edge(START, "chatbot")
-graph_builder.add_edge("chatbot", END)
-
-graph = graph_builder.compile()
-
-# Function to get agent information
-def get_agent_info(token):
-    headers = {"Authorization": f"Bearer {token}"}
-    response = requests.get(f"{API_BASE_URL}/my/agent", headers=headers)
-    if response.status_code == 200:
-        return response.json()["data"]
-    return None
-
-# Function to register a new agent
-def register_agent(username):
-    response = requests.post(f"{API_BASE_URL}/register", json={"symbol": username, "faction": "COSMIC"})
-    if response.status_code == 200:
-        return response.json()
-    return None
-
-def stream_graph_updates(user_input: str):
-    for event in graph.stream({"messages": [{"role": "user", "content": user_input}]}):
-        for value in event.values():
-            st.write("Assistant:", value["messages"][-1].content)
+from graph_logic import get_agent_info, register_agent, stream_graph_updates
 
 def main():
     st.title("SpaceTraders.io Assistant")
@@ -75,7 +15,6 @@ def main():
         ships_owned = agent_info.get('shipCount', [])
         st.sidebar.write(f"**Ships Owned:** {ships_owned}")
 
-
         structures_owned = agent_info.get('structureCount', [])
         st.sidebar.write(f"**Structures Owned:** {structures_owned}")
 
@@ -83,14 +22,14 @@ def main():
         with st.form("my_form"):
             text_input = st.text_input("Type a command or question.")
             submit_button = st.form_submit_button(label="Send")
-            
+        
         # Display the output only after the button is clicked
         if submit_button:
-            stream_graph_updates(text_input)
-            
+            response = stream_graph_updates(text_input)
+            if response:
+                st.write("Assistant:", response)
     
     else:
-
         # Sidebar for user login/registration
         st.sidebar.header("Agent Authentication")
         token = st.sidebar.text_input("Enter your token", type="password")
