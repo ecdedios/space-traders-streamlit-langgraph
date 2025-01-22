@@ -40,7 +40,7 @@ def get_agent_info(token: str):
 # Function to register a new agent
 def register_agent(username: str):
     response = requests.post(f"{API_BASE_URL}/register", json={"symbol": username, "faction": "COSMIC"})
-    if response.status_code == 200:
+    if response.status_code == 201:
         return response.json()
     return None
 
