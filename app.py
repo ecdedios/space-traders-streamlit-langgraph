@@ -2,24 +2,21 @@
 import streamlit as st
 from graph_logic import get_agent_info, register_agent, stream_graph_updates
 
-global AUTH_TOKEN
-
 def main():
-
     st.title("SpaceTraders.io Assistant")
 
     # If the user is logged in, display agent info and chatbot interface
     if "agent_info" in st.session_state:
         agent_info = st.session_state["agent_info"]
-        print(agent_info)
-        symbol = agent_info['data']['symbol']  # Default to 'N/A' if not found
-        credits = agent_info['data']['credits']  # Default to 0 if not found
-        ships_owned = agent_info['data']['shipCount']
-
         st.sidebar.header("Agent Information")
-        st.sidebar.write(f"**Username:** {symbol}")
-        st.sidebar.write(f"**Credits:** {credits:,}")
+        st.sidebar.write(f"**Username:** {agent_info['symbol']}")
+        st.sidebar.write(f"**Credits:** {agent_info['credits']}")
+
+        ships_owned = agent_info.get('shipCount', [])
         st.sidebar.write(f"**Ships Owned:** {ships_owned}")
+
+        structures_owned = agent_info.get('structureCount', [])
+        st.sidebar.write(f"**Structures Owned:** {structures_owned}")
 
         # Creating a form where the Enter key won't trigger an automatic submission
         with st.form("my_form"):
@@ -28,7 +25,7 @@ def main():
         
         # Display the output only after the button is clicked
         if submit_button:
-            response = stream_graph_updates(text_input, AUTH_TOKEN)
+            response = stream_graph_updates(text_input)
             if response:
                 st.write("Assistant:", response)
     
@@ -43,7 +40,6 @@ def main():
                 if agent_info:
                     st.session_state["token"] = token
                     st.session_state["agent_info"] = agent_info
-                    AUTH_TOKEN = token
                     st.sidebar.success("Logged in successfully!")
                     # Clear sidebar by re-writing with an empty message
                     st.sidebar.empty()
