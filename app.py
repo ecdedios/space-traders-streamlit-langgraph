@@ -13,7 +13,6 @@ def main():
         st.sidebar.header("Agent Information")
         st.sidebar.write(f"**Username:** {agent_info['symbol']}")
         st.sidebar.write(f"**Credits:** {agent_info['credits']}")
-        st.sidebar.write(f"**HQ:** {agent_info['headquarters']}")
         st.sidebar.write(f"**Ships Owned:** {agent_info.get('shipCount', 0)}")
         st.sidebar.write(f"**Structures Owned:** {agent_info.get('structureCount', 0)}")
 
@@ -39,7 +38,7 @@ def main():
                     st.session_state["token"] = token
                     st.session_state["agent_info"] = agent_info
                     st.sidebar.success("Logged in successfully!")
-                    st.rerun()
+                    st.experimental_rerun()
                 else:
                     st.sidebar.error("Invalid token. Please try again.")
             else:
